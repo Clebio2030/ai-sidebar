@@ -29,6 +29,10 @@
             padding: 0;
             height: 100%;
             width: 100%;
+            /* O botao recolhido usa translateX para alem da borda direita, e
+               transform conta para a area de rolagem. Sem isto no html, o
+               painel ganha rolagem horizontal e escorrega para a esquerda. */
+            overflow: hidden;
             background: var(--bg);
             font-family: "Segoe UI", "Noto Sans", sans-serif;
             color: var(--text);
