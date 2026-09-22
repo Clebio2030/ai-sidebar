@@ -1,0 +1,57 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;
+  font-family:"Segoe UI",system-ui,-apple-system,"Noto Sans",sans-serif}
+.wrap{width:100%;height:100%;display:flex;align-items:center;gap:52px;
+  padding:0 72px;box-sizing:border-box;
+  background:radial-gradient(120% 140% at 12% 0%,#2a3363 0%,#161c3a 45%,#090c1c 100%)}
+.glow{position:absolute;left:40px;top:50%;transform:translateY(-50%);
+  width:320px;height:320px;border-radius:50%;filter:blur(70px);
+  background:radial-gradient(circle,rgba(139,108,246,.42),rgba(16,163,127,.22) 55%,transparent 72%)}
+.icon{position:relative;flex-shrink:0}
+.txt{position:relative;color:#eef2ff}
+h1{margin:0;font-size:68px;font-weight:700;letter-spacing:-2px;line-height:1}
+p{margin:16px 0 0;font-size:25px;line-height:1.4;color:#aab4d8;max-width:660px}
+.tags{margin-top:26px;display:flex;flex-wrap:wrap;gap:9px}
+.tag{font-size:16px;color:#cfd7f5;background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.13);border-radius:100px;padding:6px 15px}
+</style></head><body>
+<div class="wrap">
+  <div class="glow"></div>
+  <div class="icon">
+    <svg width="224" height="224" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#252d55"/><stop offset="55%" stop-color="#141935"/>
+          <stop offset="100%" stop-color="#0a0d1e"/>
+        </linearGradient>
+        <linearGradient id="spark" x1="0.1" y1="0" x2="0.9" y2="1">
+          <stop offset="0%" stop-color="#6cb2ff"/><stop offset="34%" stop-color="#8b6cf6"/>
+          <stop offset="72%" stop-color="#2bc48a"/><stop offset="100%" stop-color="#10a37f"/>
+        </linearGradient>
+        <linearGradient id="ring" x1="0.1" y1="0" x2="0.9" y2="1">
+          <stop offset="0%" stop-color="#3ddc97"/><stop offset="100%" stop-color="#0f8f6f"/>
+        </linearGradient>
+        <filter id="glowf" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+      <path d="M64 13 L108 38.5 L108 89.5 L64 115 L20 89.5 L20 38.5 Z" fill="none"
+            stroke="url(#ring)" stroke-width="7" stroke-linejoin="round" opacity="0.92"/>
+      <path d="M64 19 C71 45, 83 57, 109 64 C83 71, 71 83, 64 109
+               C57 83, 45 71, 19 64 C45 57, 57 45, 64 19 Z"
+            fill="url(#spark)" filter="url(#glowf)"/>
+    </svg>
+  </div>
+  <div class="txt">
+    <h1>AI Sidebar</h1>
+    <p>Todas as suas IAs no painel lateral do navegador &mdash; usando as assinaturas que voc&ecirc; j&aacute; paga.</p>
+    <div class="tags">
+      <span class="tag">ChatGPT</span><span class="tag">Claude</span><span class="tag">Gemini</span>
+      <span class="tag">Grok</span><span class="tag">Copilot</span><span class="tag">Meta AI</span>
+      <span class="tag">DeepSeek</span><span class="tag">Le Chat</span>
+    </div>
+  </div>
+</div>
+</body></html>
