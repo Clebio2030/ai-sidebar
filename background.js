@@ -111,17 +111,26 @@ const aplicarModo = (modo) =>
     .setPanelBehavior({ openPanelOnActionClick: modo === "painel" })
     .catch((error) => console.error("Side Panel Error:", error))
 
-const injetarFlutuante = (tabId) =>
-  chrome.scripting.executeScript({
+// A intencao viaja numa variavel do mundo isolado porque executeScript com
+// "files" nao aceita argumentos. Sem ela, reinjetar para mostrar a janela
+// fixada faria o contrario: alternar, escondendo-a.
+const injetarFlutuante = async (tabId, intencao = "alternar") => {
+  await chrome.scripting.executeScript({
+    target: { tabId },
+    func: (valor) => { window.__aiSidebarIntencao = valor },
+    args: [intencao],
+  })
+  return chrome.scripting.executeScript({
     target: { tabId },
     files: ["providers.js", "floating.js"],
   })
+}
 
 const definirModo = async (modo, tab) => {
   await chrome.storage.local.set({ modo })
   await aplicarModo(modo)
   if (modo === "flutuante" && tab?.id && !isRestrictedUrl(tab.url)) {
-    await injetarFlutuante(tab.id).catch(() => {})
+    await injetarFlutuante(tab.id, "mostrar").catch(() => {})
   }
 }
 
@@ -129,26 +138,44 @@ chrome.action.onClicked.addListener(async (tab) => {
   // So chega aqui no modo flutuante; no modo painel o clique abre o painel.
   if (!tab?.id) return
   if (isRestrictedUrl(tab.url)) return
-  await injetarFlutuante(tab.id).catch((error) => console.warn("Injecao falhou:", error?.message))
+  await injetarFlutuante(tab.id, "alternar")
+    .catch((error) => console.warn("Injecao falhou:", error?.message))
 })
 
-// Fixada, a janela volta sozinha a cada navegacao e em cada aba nova.
-chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
-  if (info.status !== "complete") return
+const estaFixada = async () => {
   const { modo, flutuante } = await chrome.storage.local.get(["modo", "flutuante"])
-  if (modo !== "flutuante" || !flutuante?.fixado) return
-  if (isRestrictedUrl(tab?.url)) return
-  injetarFlutuante(tabId).catch(() => {})
+  return modo === "flutuante" && !!flutuante?.fixado
+}
+
+const talvezMostrar = async (tabId, url) => {
+  if (!tabId || isRestrictedUrl(url)) return
+  if (!(await estaFixada())) return
+  injetarFlutuante(tabId, "mostrar").catch(() => {})
+}
+
+// Fixada, a janela acompanha navegacoes e abas novas...
+chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
+  if (info.status !== "complete") return
+  talvezMostrar(tabId, tab?.url)
+})
+
+// ...e tambem a simples troca de aba: onUpdated so dispara em navegacao, entao
+// uma aba ja carregada nunca receberia a janela ao ser reativada.
+chrome.tabs.onActivated.addListener(async ({ tabId }) => {
+  const tab = await chrome.tabs.get(tabId).catch(() => null)
+  if (tab) talvezMostrar(tabId, tab.url)
 })
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request?.action === "USAR_PAINEL") {
-    definirModo("painel", sender.tab).then(() => {
-      // Trocar o modo so faz o proximo clique no icone abrir o painel; abrir
-      // agora exige gesto do usuario e pode ser recusado - dai o catch.
-      const janela = sender.tab?.windowId
-      if (janela === undefined) return
-      Promise.resolve(chrome.sidePanel.open({ windowId: janela })).catch(() => {})
-    })
+    // Precisa vir ANTES de qualquer await: sidePanel.open() exige gesto do
+    // usuario, e o gesto nao sobrevive a um await. Chamar depois de trocar o
+    // modo fazia a janela fechar sem o painel abrir.
+    const janela = sender.tab?.windowId
+    if (janela !== undefined) {
+      Promise.resolve(chrome.sidePanel.open({ windowId: janela }))
+        .catch((error) => console.warn("sidePanel.open recusado:", error?.message))
+    }
+    definirModo("painel", sender.tab)
     return
   }
   if (request?.action === "USAR_FLUTUANTE") {

@@ -2,8 +2,14 @@
 // Reinjetar o arquivo apenas alterna a visibilidade, em vez de duplicar.
 ;(() => {
     const CHAVE = '__aiSidebarFloat'
+    // "alternar" é o clique no ícone; "mostrar" é a janela fixada seguindo o
+    // usuário de aba em aba, onde alternar a esconderia.
+    const intencao = window.__aiSidebarIntencao || 'alternar'
+    window.__aiSidebarIntencao = null
+
     if (window[CHAVE]) {
-        window[CHAVE].alternar()
+        if (intencao === 'mostrar') window[CHAVE].mostrar()
+        else window[CHAVE].alternar()
         return
     }
 
@@ -115,10 +121,18 @@
         btFixar.classList.toggle('ativo', estado.fixado)
     }
 
+    // Nada é gravado antes de o estado salvo ser lido. Gravar antes sobrescrevia
+    // tudo com os padrões — era o que desfazia o "fixado" assim que a janela
+    // abria numa aba, fazendo-a não aparecer nas seguintes.
+    let carregado = false
+
     // Persistir é conveniência, não requisito: a janela funciona sem isso.
     const salvar = () => {
+        if (!carregado) return
         try {
-            chrome.storage.local.set({ flutuante: { ...estado } }).catch(() => {})
+            chrome.storage.local
+                .set({ flutuante: { ...estado }, selectedProvider: estado.provedor })
+                .catch(() => {})
         } catch (e) {
             /* contexto da extensão invalidado após recarga */
         }
@@ -176,7 +190,6 @@
         estado.provedor = providerExists(id) ? id : AI_PROVIDERS[0].id
         seletor.value = estado.provedor
         quadro.src = providerUrl(estado.provedor)
-        chrome.storage.local.set({ selectedProvider: estado.provedor })
         salvar()
     }
 
@@ -210,23 +223,37 @@
             pintar()
             salvar()
         },
+        mostrar: () => {
+            if (estado.aberto) return
+            estado.aberto = true
+            pintar()
+            salvar()
+        },
     }
 
     // --- iniciar ---------------------------------------------------------------
-    // A janela sobe primeiro, com os padrões. O estado salvo é aplicado depois,
-    // se vier: antes isto ficava dentro do callback do storage, e uma falha de
-    // leitura deixava a janela sem nunca ser anexada ao documento.
+    // A janela sobe primeiro, com os padrões: antes isto ficava dentro do
+    // callback do storage, e uma falha de leitura a deixava sem nunca ser
+    // anexada ao documento. O iframe só recebe src depois, para não carregar
+    // o provedor padrão e trocar em seguida pelo que estava salvo.
     document.documentElement.appendChild(host)
-    trocarProvedor(estado.provedor)
     pintar()
 
-    chrome.storage.local
-        .get(['flutuante', 'selectedProvider'])
-        .then(({ flutuante = {}, selectedProvider }) => {
-            Object.assign(estado, flutuante, { aberto: true })
-            const escolhido = flutuante.provedor || selectedProvider
-            if (escolhido && escolhido !== estado.provedor) trocarProvedor(escolhido)
-            pintar()
-        })
-        .catch(() => { /* sem estado salvo: seguem os padrões já pintados */ })
+    const iniciar = (provedor) => {
+        carregado = true
+        trocarProvedor(provedor || estado.provedor)
+        pintar()
+    }
+
+    try {
+        chrome.storage.local
+            .get(['flutuante', 'selectedProvider'])
+            .then(({ flutuante = {}, selectedProvider }) => {
+                Object.assign(estado, flutuante, { aberto: true })
+                iniciar(flutuante.provedor || selectedProvider)
+            })
+            .catch(() => iniciar())
+    } catch (e) {
+        iniciar()
+    }
 })()
