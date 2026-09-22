@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AI Sidebar</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            --bg: #f4f7fb;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #dce4ef;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0f1117;
+                --surface: #1a1d27;
+                --text: #e2e8f0;
+                --muted: #94a3b8;
+                --border: #2a2f3e;
+            }
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background: var(--bg);
+            font-family: "Segoe UI", "Noto Sans", sans-serif;
+            color: var(--text);
+        }
+
+        body {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            overflow: hidden;
+            /* anchors the floating summary button */
+            position: relative;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 10px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        select {
+            flex: 1;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 10px;
+            font-size: 13px;
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+            outline: none;
+        }
+
+        select:focus {
+            border-color: var(--accent, #0f766e);
+        }
+
+        /* Botao flutuante recolhido na borda: so o icone aparece, o rotulo
+           surge no hover - mesmo comportamento da extensao de origem. */
+        #summary-layer {
+            position: absolute;
+            bottom: 120px;
+            right: 0;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        #summarize {
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 50px;
+            padding: 12px 20px 12px 18px;
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-right: none;
+            border-radius: 26px 0 0 26px;
+            box-shadow: -4px 8px 24px rgba(0, 0, 0, .12), -1px 2px 8px rgba(0, 0, 0, .06);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transform: translateX(calc(100% - 52px));
+            transition: transform .3s cubic-bezier(.16, 1, .3, 1), box-shadow .2s;
+        }
+
+        #summarize:hover {
+            transform: translateX(0);
+            box-shadow: -6px 12px 32px rgba(0, 0, 0, .18);
+        }
+
+        #summarize:disabled { opacity: .7; cursor: not-allowed; }
+
+        .btn-icon, .btn-icon svg { width: 24px; height: 24px; flex-shrink: 0; }
+        .btn-icon { display: flex; align-items: center; justify-content: center; }
+        .btn-text { opacity: .95; letter-spacing: -.02em; }
+
+        dialog#blocked {
+            border: none;
+            border-radius: 28px;
+            width: 100%;
+            max-width: 320px;
+            padding: 24px 20px 20px;
+            background: var(--surface);
+            color: var(--text);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, .25), 0 4px 12px rgba(0, 0, 0, .12);
+            font-family: inherit;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        dialog#blocked::backdrop {
+            background: rgba(0, 0, 0, .45);
+            backdrop-filter: blur(6px);
+        }
+
+        dialog#blocked[open] { animation: popIn .3s cubic-bezier(.175, .885, .32, 1.275); }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-icons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-icons img { width: 28px; height: 28px; object-fit: contain; border-radius: 6px; }
+        .modal-divider { width: 1px; height: 20px; background: var(--border); }
+
+        dialog#blocked h2 {
+            font-size: 1.12rem;
+            font-weight: 600;
+            letter-spacing: -.02em;
+            line-height: 1.35;
+            margin: 0 0 12px;
+        }
+
+        .modal-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg);
+            color: var(--muted);
+            border-radius: 100px;
+            padding: 5px 14px;
+            font-size: .78rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .modal-body {
+            font-size: .83rem;
+            line-height: 1.55;
+            color: var(--muted);
+            text-align: left;
+            background: var(--bg);
+            padding: 12px 14px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-body p { margin: 0 0 8px; font-weight: 500; }
+        .modal-body ul { margin: 0; padding-left: 16px; }
+        .modal-body li { margin-bottom: 4px; }
+        .modal-body code { word-break: break-all; font-weight: 400; }
+
+        .modal-footer { display: flex; justify-content: flex-end; }
+
+        .modal-footer button {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 9px 24px;
+            font-family: inherit;
+            font-size: .88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        #mic-fix {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 10px;
+            font-size: 12px;
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="toolbar">
+        <select id="provider" aria-label="Select AI provider">
+            <option value="chatgpt">ChatGPT</option>
+            <option value="claude">Claude</option>
+            <option value="gemini">Gemini</option>
+            <option value="grok">Grok (X)</option>
+            <option value="copilot">Copilot</option>
+            <option value="meta">Meta AI</option>
+            <option value="deepseek">DeepSeek</option>
+            <option value="lechat">Le Chat (Mistral)</option>
+        </select>
+        <button id="mic-fix" hidden title="Liberar microfone para o painel">🎤 Liberar</button>
+    </div>
+    <div id="summary-layer">
+        <button id="summarize" title="Resumir a página da aba ativa">
+            <span class="btn-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="#1a73e8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 4H7" />
+                    <path d="m18 16 3 3-3 3" />
+                    <path d="M3 4v13a2 2 0 0 0 2 2h16" />
+                    <path d="M7 14h7" />
+                    <path d="M7 9h12" />
+                </svg>
+            </span>
+            <span class="btn-text">Resumir página</span>
+        </button>
+    </div>
+
+    <iframe id="ai-frame" src="about:blank" title="AI provider"
+        allow="microphone; camera; clipboard-read; clipboard-write; display-capture; autoplay; encrypted-media; fullscreen; picture-in-picture"></iframe>
+
+    <dialog id="blocked">
+        <div class="modal-icons">
+            <img src="icon.png" alt="">
+            <div class="modal-divider"></div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                stroke="#1a73e8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 4H7" />
+                <path d="m18 16 3 3-3 3" />
+                <path d="M3 4v13a2 2 0 0 0 2 2h16" />
+                <path d="M7 14h7" />
+                <path d="M7 9h12" />
+            </svg>
+        </div>
+        <h2>Não foi possível ler a página</h2>
+        <div class="modal-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            Página protegida ou do sistema
+        </div>
+        <div class="modal-body">
+            <p>Restrições de acesso a páginas:</p>
+            <ul>
+                <li>Páginas internas do navegador (chrome://)</li>
+                <li>Chrome Web Store e páginas de configurações</li>
+                <li>Abas protegidas por políticas de segurança</li>
+            </ul>
+            <p id="blocked-action" style="margin:10px 0 0"></p>
+            <p id="blocked-detail" style="margin:6px 0 0; font-weight:400; opacity:.8"></p>
+        </div>
+        <div class="modal-footer">
+            <button id="blocked-ok">OK</button>
+        </div>
+    </dialog>
+
+    <script src="sidepanel.js"></script>
+</body>
+
+</html>

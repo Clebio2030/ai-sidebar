@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Liberar microfone — AI Sidebar</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            --bg: #f4f7fb;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #dce4ef;
+            --accent: #0f766e;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0f1117;
+                --surface: #1a1d27;
+                --text: #e2e8f0;
+                --muted: #94a3b8;
+                --border: #2a2f3e;
+            }
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Segoe UI", "Noto Sans", sans-serif;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        main {
+            max-width: 460px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px;
+        }
+
+        h1 { font-size: 19px; margin: 0 0 12px; }
+        p { color: var(--muted); line-height: 1.55; margin: 0 0 16px; font-size: 14px; }
+
+        button {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            padding: 11px 18px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button:disabled { opacity: .5; cursor: default; }
+
+        #status { margin-top: 16px; font-size: 13px; min-height: 19px; }
+        #status.ok { color: var(--accent); }
+        #status.err { color: #dc2626; font-family: ui-monospace, monospace; }
+    </style>
+</head>
+
+<body>
+    <main>
+        <h1>Liberar microfone</h1>
+        <p>
+            O painel lateral não consegue exibir o aviso de permissão do navegador,
+            então o pedido é descartado antes que você possa respondê-lo. Esta aba
+            mostra o aviso num lugar onde ele aparece. A permissão fica registrada
+            para a extensão e passa a valer dentro do painel.
+        </p>
+        <button id="grant">Permitir microfone</button>
+        <p id="status"></p>
+    </main>
+
+    <script src="permission.js"></script>
+</body>
+
+</html>
