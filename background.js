@@ -1,7 +1,3 @@
-chrome.sidePanel
-  .setPanelBehavior({ openPanelOnActionClick: true })
-  .catch((error) => console.error('Side Panel Error:', error))
-
 const applySessionRules = () =>
   chrome.declarativeNetRequest.updateSessionRules({
     removeRuleIds: [1],
@@ -31,11 +27,11 @@ const applySessionRules = () =>
     ],
   })
 
-const init = () => applySessionRules()
+const init = async () => {
+  await applySessionRules()
+  await aplicarModo(await lerModo())
+}
 
-// Session rules die with the browser session and the MV3 worker is torn down
-// aggressively, so re-assert state on every wake-up, not just on install.
-init()
 
 // Aside has no scheme of its own: its internal pages are chrome:// too
 // (chrome://aside-adblock, chrome://aside-import-data), so this list covers it.
@@ -102,7 +98,65 @@ const getActiveTabContent = async () => {
   }
 }
 
+// --- modo de exibicao: painel lateral ou janela flutuante ------------------
+
+const MODO_PADRAO = "painel"
+
+const lerModo = async () => (await chrome.storage.local.get("modo")).modo || MODO_PADRAO
+
+// Com openPanelOnActionClick ligado o clique abre o painel e action.onClicked
+// nao dispara. Desligar e o que libera o clique para a janela flutuante.
+const aplicarModo = (modo) =>
+  chrome.sidePanel
+    .setPanelBehavior({ openPanelOnActionClick: modo === "painel" })
+    .catch((error) => console.error("Side Panel Error:", error))
+
+const injetarFlutuante = (tabId) =>
+  chrome.scripting.executeScript({
+    target: { tabId },
+    files: ["providers.js", "floating.js"],
+  })
+
+const definirModo = async (modo, tab) => {
+  await chrome.storage.local.set({ modo })
+  await aplicarModo(modo)
+  if (modo === "flutuante" && tab?.id && !isRestrictedUrl(tab.url)) {
+    await injetarFlutuante(tab.id).catch(() => {})
+  }
+}
+
+chrome.action.onClicked.addListener(async (tab) => {
+  // So chega aqui no modo flutuante; no modo painel o clique abre o painel.
+  if (!tab?.id) return
+  if (isRestrictedUrl(tab.url)) return
+  await injetarFlutuante(tab.id).catch((error) => console.warn("Injecao falhou:", error?.message))
+})
+
+// Fixada, a janela volta sozinha a cada navegacao e em cada aba nova.
+chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
+  if (info.status !== "complete") return
+  const { modo, flutuante } = await chrome.storage.local.get(["modo", "flutuante"])
+  if (modo !== "flutuante" || !flutuante?.fixado) return
+  if (isRestrictedUrl(tab?.url)) return
+  injetarFlutuante(tabId).catch(() => {})
+})
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request?.action === "USAR_PAINEL") {
+    definirModo("painel", sender.tab).then(() => {
+      // Trocar o modo so faz o proximo clique no icone abrir o painel; abrir
+      // agora exige gesto do usuario e pode ser recusado - dai o catch.
+      const janela = sender.tab?.windowId
+      if (janela === undefined) return
+      Promise.resolve(chrome.sidePanel.open({ windowId: janela })).catch(() => {})
+    })
+    return
+  }
+  if (request?.action === "USAR_FLUTUANTE") {
+    chrome.tabs
+      .query({ active: true, lastFocusedWindow: true })
+      .then(([tab]) => definirModo("flutuante", tab))
+    return
+  }
   if (request?.action !== "GET_ACTIVE_TAB_CONTENT") return
   getActiveTabContent().then(sendResponse)
   return true // keep the channel open for the async reply
@@ -125,3 +179,8 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     chrome.sidePanel.open({ windowId: tab.windowId })
   }
 })
+
+// Session rules die with the browser session and the MV3 worker is torn down
+// aggressively, so re-assert state on every wake-up, not just on install.
+// Fica no fim do arquivo porque init() depende de tudo que vem acima.
+init()

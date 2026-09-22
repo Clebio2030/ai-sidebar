@@ -1,20 +1,18 @@
-const PROVIDERS = {
-    chatgpt:    'https://chatgpt.com/',
-    claude:     'https://claude.ai/new',
-    gemini:     'https://gemini.google.com/app',
-    grok:       'https://grok.com/',
-    copilot:    'https://copilot.microsoft.com/',
-    meta:       'https://www.meta.ai/',
-    deepseek:   'https://chat.deepseek.com/',
-    lechat:     'https://chat.mistral.ai/chat',
-}
 
 const providerSelect = document.getElementById('provider')
 const frame = document.getElementById('ai-frame')
 
+// As opções vêm de providers.js, para não haver duas listas divergindo.
+for (const p of AI_PROVIDERS) {
+    const opcao = document.createElement('option')
+    opcao.value = p.id
+    opcao.textContent = p.nome
+    providerSelect.appendChild(opcao)
+}
+
 const setProvider = async (id) => {
-    const safe = PROVIDERS[id] ? id : 'chatgpt'
-    frame.src = PROVIDERS[safe]
+    const safe = providerExists(id) ? id : AI_PROVIDERS[0].id
+    frame.src = providerUrl(safe)
     providerSelect.value = safe
     await chrome.storage.local.set({ selectedProvider: safe })
 }
@@ -115,6 +113,13 @@ summarize.addEventListener('click', async () => {
 // before the user can answer. A normal tab can show it, and the grant is stored
 // for this extension origin - which is what a delegated iframe request resolves
 // to - so it then applies inside the panel.
+// Troca para a janela flutuante: o service worker injeta na aba ativa e
+// passa a tratar o clique no ícone como "flutuar" em vez de "abrir painel".
+document.getElementById('flutuar').addEventListener('click', () => {
+    chrome.runtime.sendMessage({ action: 'USAR_FLUTUANTE' })
+    window.close()
+})
+
 const micFix = document.getElementById("mic-fix")
 
 micFix.addEventListener("click", () => {

@@ -209,6 +209,7 @@
             transition: background .2s;
         }
 
+        #flutuar,
         #mic-fix {
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -232,15 +233,8 @@
 <body>
     <div class="toolbar">
         <select id="provider" aria-label="Select AI provider">
-            <option value="chatgpt">ChatGPT</option>
-            <option value="claude">Claude</option>
-            <option value="gemini">Gemini</option>
-            <option value="grok">Grok (X)</option>
-            <option value="copilot">Copilot</option>
-            <option value="meta">Meta AI</option>
-            <option value="deepseek">DeepSeek</option>
-            <option value="lechat">Le Chat (Mistral)</option>
         </select>
+        <button id="flutuar" title="Abrir como janela flutuante sobre a página">Flutuar</button>
         <button id="mic-fix" hidden title="Liberar microfone para o painel">🎤 Liberar</button>
     </div>
     <div id="summary-layer">
@@ -299,6 +293,7 @@
         </div>
     </dialog>
 
+    <script src="providers.js"></script>
     <script src="sidepanel.js"></script>
 </body>
 
