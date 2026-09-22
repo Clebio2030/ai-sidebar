@@ -73,7 +73,10 @@ const askBackground = (message, timeoutMs = 8000) =>
         }
     })
 
-const showBlocked = (action, detail) => {
+const blockedTitle = document.getElementById('blocked-title')
+
+const showBlocked = (action, detail, titulo) => {
+    blockedTitle.textContent = titulo || 'Não foi possível ler a página'
     blockedAction.textContent = action
     blockedDetail.textContent = detail || ''
     blocked.showModal()
@@ -115,9 +118,21 @@ summarize.addEventListener('click', async () => {
 // to - so it then applies inside the panel.
 // Troca para a janela flutuante: o service worker injeta na aba ativa e
 // passa a tratar o clique no ícone como "flutuar" em vez de "abrir painel".
-document.getElementById('flutuar').addEventListener('click', () => {
-    chrome.runtime.sendMessage({ action: 'USAR_FLUTUANTE' })
-    window.close()
+document.getElementById('flutuar').addEventListener('click', async () => {
+    // Só fecha o painel se a janela realmente abriu: fechar antes de saber
+    // deixava o usuário sem painel e sem janela em páginas restritas.
+    const r = await chrome.runtime.sendMessage({ action: 'USAR_FLUTUANTE' })
+    if (r?.ok) {
+        window.close()
+        return
+    }
+    showBlocked(
+        r?.motivo === 'restrita'
+            ? 'A janela flutuante não pode abrir nesta aba. Vá para um site comum e tente de novo.'
+            : 'Não foi possível abrir a janela flutuante: ' + (r?.motivo || 'motivo desconhecido'),
+        r?.url,
+        'Janela flutuante indisponível',
+    )
 })
 
 const micFix = document.getElementById("mic-fix")

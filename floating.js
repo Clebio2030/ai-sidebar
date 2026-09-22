@@ -7,11 +7,20 @@
     const intencao = window.__aiSidebarIntencao || 'alternar'
     window.__aiSidebarIntencao = null
 
-    if (window[CHAVE]) {
-        if (intencao === 'mostrar') window[CHAVE].mostrar()
-        else window[CHAVE].alternar()
+    const api = window[CHAVE]
+    const anterior = document.getElementById('ai-sidebar-float-host')
+
+    if (anterior && api && typeof api.mostrar === 'function') {
+        if (intencao === 'mostrar') api.mostrar()
+        else api.alternar()
         return
     }
+
+    // Chegar aqui com sobras significa instância de uma versão anterior da
+    // extensão: recarregar a extensão não limpa o mundo isolado das abas já
+    // abertas, e a API antiga não tem os métodos novos. Recomeça do zero em
+    // vez de chamar algo que não existe e falhar em silêncio.
+    if (anterior) anterior.remove()
 
     const MIN_L = 320
     const MIN_A = 380

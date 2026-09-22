@@ -179,10 +179,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return
   }
   if (request?.action === "USAR_FLUTUANTE") {
-    chrome.tabs
-      .query({ active: true, lastFocusedWindow: true })
-      .then(([tab]) => definirModo("flutuante", tab))
-    return
+    // Responde se deu certo: o painel so deve se fechar quando a janela
+    // realmente abriu. Antes ele fechava sempre, e numa aba restrita o
+    // usuario ficava sem painel e sem janela.
+    ;(async () => {
+      const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true })
+      if (!tab?.id || isRestrictedUrl(tab.url)) {
+        sendResponse({ ok: false, motivo: "restrita", url: tab?.url })
+        return
+      }
+      try {
+        await injetarFlutuante(tab.id, "mostrar")
+        await chrome.storage.local.set({ modo: "flutuante" })
+        await aplicarModo("flutuante")
+        sendResponse({ ok: true })
+      } catch (error) {
+        sendResponse({ ok: false, motivo: error?.message, url: tab.url })
+      }
+    })()
+    return true // resposta assincrona
   }
   if (request?.action !== "GET_ACTIVE_TAB_CONTENT") return
   getActiveTabContent().then(sendResponse)
