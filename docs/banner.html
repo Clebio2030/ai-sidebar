@@ -18,31 +18,24 @@ p{margin:16px 0 0;font-size:25px;line-height:1.4;color:#aab4d8;max-width:660px}
 <div class="wrap">
   <div class="glow"></div>
   <div class="icon">
-    <svg width="224" height="224" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#252d55"/><stop offset="55%" stop-color="#141935"/>
-          <stop offset="100%" stop-color="#0a0d1e"/>
-        </linearGradient>
-        <linearGradient id="spark" x1="0.1" y1="0" x2="0.9" y2="1">
-          <stop offset="0%" stop-color="#6cb2ff"/><stop offset="34%" stop-color="#8b6cf6"/>
-          <stop offset="72%" stop-color="#2bc48a"/><stop offset="100%" stop-color="#10a37f"/>
-        </linearGradient>
-        <linearGradient id="ring" x1="0.1" y1="0" x2="0.9" y2="1">
-          <stop offset="0%" stop-color="#3ddc97"/><stop offset="100%" stop-color="#0f8f6f"/>
-        </linearGradient>
-        <filter id="glowf" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="4" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
-      <rect width="128" height="128" rx="28" fill="url(#bg)"/>
-      <path d="M64 13 L108 38.5 L108 89.5 L64 115 L20 89.5 L20 38.5 Z" fill="none"
-            stroke="url(#ring)" stroke-width="7" stroke-linejoin="round" opacity="0.92"/>
-      <path d="M64 19 C71 45, 83 57, 109 64 C83 71, 71 83, 64 109
-               C57 83, 45 71, 19 64 C45 57, 57 45, 64 19 Z"
-            fill="url(#spark)" filter="url(#glowf)"/>
-    </svg>
+    <svg width="224" height="224" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"><defs>
+  <radialGradient id="bgx" cx="0.5" cy="0.42" r="0.82">
+    <stop offset="0%" stop-color="#28325f"/><stop offset="100%" stop-color="#090c1c"/></radialGradient>
+  <linearGradient id="cox" x1="0.2" y1="0" x2="0.8" y2="1">
+    <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#cfe0ff"/></linearGradient>
+  <filter id="glx" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur stdDeviation="3.4" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<rect width="128" height="128" rx="28" fill="url(#bgx)"/>
+<circle cx="64" cy="30" r="20" fill="#10a37f"/>
+<circle cx="34" cy="86" r="20" fill="#4285f4"/>
+<circle cx="94" cy="86" r="20" fill="#d97757"/>
+<path d="M64 36 C71.84 56.16, 71.84 56.16, 92 64
+    C71.84 71.84, 71.84 71.84, 64 92
+    C56.16 71.84, 56.16 71.84, 36 64
+    C56.16 56.16, 56.16 56.16, 64 36 Z"
+    fill="url(#cox)" filter="url(#glx)"/>
+</svg>
   </div>
   <div class="txt">
     <h1>AI Sidebar</h1>

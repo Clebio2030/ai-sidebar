@@ -4,3 +4,6 @@ Gemini-Sidebar-Chrome-Web-Store/
 
 # Backups locais
 *.bak
+
+# Comparativo de icones (temporario, ate a escolha)
+variacoes-icone.*
