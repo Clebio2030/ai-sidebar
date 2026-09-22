@@ -20,4 +20,10 @@ if (typeof AI_PROVIDERS === 'undefined') {
         (AI_PROVIDERS.find((p) => p.id === id) || AI_PROVIDERS[0]).url
 
     var providerExists = (id) => AI_PROVIDERS.some((p) => p.id === id)
+
+    // Usado para conferir se uma URL relatada pertence mesmo ao provedor atual,
+    // e não a um redirecionamento de login.
+    var providerOrigin = (id) => {
+        try { return new URL(providerUrl(id)).origin } catch (e) { return "" }
+    }
 }

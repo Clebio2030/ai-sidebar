@@ -119,6 +119,8 @@
         .btn-icon { display: flex; align-items: center; justify-content: center; }
         .btn-text { opacity: .95; letter-spacing: -.02em; }
 
+        #flutuar svg { width: 14px; height: 14px; flex-shrink: 0; }
+
         dialog#blocked {
             border: none;
             border-radius: 28px;
@@ -211,6 +213,9 @@
 
         #flutuar,
         #mic-fix {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 7px 10px;
@@ -234,7 +239,14 @@
     <div class="toolbar">
         <select id="provider" aria-label="Select AI provider">
         </select>
-        <button id="flutuar" title="Abrir como janela flutuante sobre a página">Flutuar</button>
+        <button id="flutuar" title="Abrir como janela flutuante sobre a página">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="4" width="14" height="11" rx="2"/>
+                <rect x="9" y="10" width="13" height="10" rx="2" fill="var(--surface)"/>
+            </svg>
+            Flutuar
+        </button>
         <button id="mic-fix" hidden title="Liberar microfone para o painel">🎤 Liberar</button>
     </div>
     <div id="summary-layer">

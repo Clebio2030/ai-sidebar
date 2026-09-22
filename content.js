@@ -75,6 +75,30 @@ window.addEventListener('message', (e) => {
     attempt()
 })
 
+// Relata ao painel/janela qual conversa está aberta, para que trocar de aba
+// continue de onde parou em vez de recomeçar. Os provedores trocam de URL por
+// pushState, sem recarregar e sem disparar evento próprio — daí a checagem
+// periódica, que é barata perto de qualquer alternativa.
+if (window !== window.top) {
+    let ultimaUrl = ''
+    const relatarUrl = () => {
+        if (location.href === ultimaUrl) return
+        ultimaUrl = location.href
+        try {
+            window.parent.postMessage(
+                { type: 'ai-sidebar-url', url: location.href, origem: location.origin },
+                '*',
+            )
+        } catch (e) {
+            /* pai de outra origem que não aceita a mensagem */
+        }
+    }
+
+    relatarUrl()
+    setInterval(relatarUrl, 1500)
+    addEventListener('popstate', relatarUrl)
+}
+
 // --- Diagnóstico temporário: remover quando microfone/clipboard estiverem ok ---
 ;(async () => {
     const fp = document.featurePolicy || document.permissionsPolicy

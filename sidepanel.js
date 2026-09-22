@@ -10,18 +10,39 @@ for (const p of AI_PROVIDERS) {
     providerSelect.appendChild(opcao)
 }
 
+// Última conversa aberta em cada provedor, compartilhada com a janela
+// flutuante: é o que faz alternar entre painel e janela — ou trocar de aba —
+// continuar de onde parou, em vez de recomeçar do zero.
+let conversas = {}
+let provedorAtual = 'chatgpt'
+
 const setProvider = async (id) => {
     const safe = providerExists(id) ? id : AI_PROVIDERS[0].id
-    frame.src = providerUrl(safe)
+    provedorAtual = safe
+    frame.src = conversas[safe] || providerUrl(safe)
     providerSelect.value = safe
     await chrome.storage.local.set({ selectedProvider: safe })
 }
 
 providerSelect.addEventListener('change', e => setProvider(e.target.value))
 
-chrome.storage.local.get('selectedProvider').then(({ selectedProvider = 'chatgpt' }) => {
-    setProvider(selectedProvider)
+// O content.js dentro do iframe relata qual conversa está aberta.
+window.addEventListener('message', (e) => {
+    if (e.data?.type !== 'ai-sidebar-url' || !e.data.url) return
+    if (e.source !== frame.contentWindow) return
+    // Ignora redirecionamentos para fora do provedor, como telas de login.
+    if (e.data.origem !== providerOrigin(provedorAtual)) return
+    if (conversas[provedorAtual] === e.data.url) return
+    conversas[provedorAtual] = e.data.url
+    chrome.storage.local.set({ conversas }).catch(() => {})
 })
+
+chrome.storage.local.get(['selectedProvider', 'conversas']).then(
+    ({ selectedProvider = 'chatgpt', conversas: salvas }) => {
+        conversas = salvas || {}
+        setProvider(selectedProvider)
+    },
+)
 
 // When the iframe finishes loading, deliver any pending text
 frame.addEventListener('load', async () => {

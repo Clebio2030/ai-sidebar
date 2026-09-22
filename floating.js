@@ -195,12 +195,32 @@
     })
 
     // --- ações ----------------------------------------------------------------
+    // Última conversa aberta em cada provedor, compartilhada com o painel
+    // lateral: é o que faz trocar de aba continuar de onde parou.
+    let conversas = {}
+
     const trocarProvedor = (id) => {
         estado.provedor = providerExists(id) ? id : AI_PROVIDERS[0].id
         seletor.value = estado.provedor
-        quadro.src = providerUrl(estado.provedor)
+        quadro.src = conversas[estado.provedor] || providerUrl(estado.provedor)
         salvar()
     }
+
+    addEventListener('message', (e) => {
+        if (e.data?.type !== 'ai-sidebar-url' || !e.data.url) return
+        if (e.source !== quadro.contentWindow) return
+        // Ignora redirecionamentos para fora do provedor, como telas de login:
+        // guardá-los faria a próxima abertura cair na página errada.
+        if (e.data.origem !== providerOrigin(estado.provedor)) return
+        if (conversas[estado.provedor] === e.data.url) return
+        conversas[estado.provedor] = e.data.url
+        if (!carregado) return
+        try {
+            chrome.storage.local.set({ conversas }).catch(() => {})
+        } catch (err) {
+            /* contexto da extensão invalidado */
+        }
+    })
 
     seletor.addEventListener('change', (e) => trocarProvedor(e.target.value))
 
@@ -256,9 +276,10 @@
 
     try {
         chrome.storage.local
-            .get(['flutuante', 'selectedProvider'])
-            .then(({ flutuante = {}, selectedProvider }) => {
+            .get(['flutuante', 'selectedProvider', 'conversas'])
+            .then(({ flutuante = {}, selectedProvider, conversas: salvas }) => {
                 Object.assign(estado, flutuante, { aberto: true })
+                conversas = salvas || {}
                 iniciar(flutuante.provedor || selectedProvider)
             })
             .catch(() => iniciar())
