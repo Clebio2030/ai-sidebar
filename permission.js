@@ -1,3 +1,5 @@
+traduzir()
+
 const button = document.getElementById('grant')
 const status = document.getElementById('status')
 
@@ -10,7 +12,7 @@ const report = async () => {
     try {
         const { state } = await navigator.permissions.query({ name: 'microphone' })
         if (state === 'granted') {
-            show('Microfone já liberado. Pode fechar esta aba e reabrir o painel.', 'ok')
+            show(chrome.i18n.getMessage('permAlready'), 'ok')
             button.disabled = true
         }
     } catch (error) {
@@ -20,11 +22,11 @@ const report = async () => {
 
 button.addEventListener('click', async () => {
     button.disabled = true
-    show('Aguardando sua resposta no aviso do navegador…', '')
+    show(chrome.i18n.getMessage('permWaiting'), '')
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
         stream.getTracks().forEach((track) => track.stop())
-        show('Pronto. Feche esta aba e reabra o painel lateral.', 'ok')
+        show(chrome.i18n.getMessage('permDone'), 'ok')
     } catch (error) {
         show(error.name + ': ' + error.message, 'err')
         button.disabled = false

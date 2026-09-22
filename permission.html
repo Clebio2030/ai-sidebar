@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Liberar microfone — AI Sidebar</title>
+    <title data-i18n-page="permPageTitle">Allow microphone — AI Sidebar</title>
     <style>
         :root {
             color-scheme: light dark;
@@ -68,17 +68,13 @@
 
 <body>
     <main>
-        <h1>Liberar microfone</h1>
-        <p>
-            O painel lateral não consegue exibir o aviso de permissão do navegador,
-            então o pedido é descartado antes que você possa respondê-lo. Esta aba
-            mostra o aviso num lugar onde ele aparece. A permissão fica registrada
-            para a extensão e passa a valer dentro do painel.
-        </p>
-        <button id="grant">Permitir microfone</button>
+        <h1 data-i18n="permHeading">Allow microphone</h1>
+        <p data-i18n="permBody">The side panel cannot show the browser permission prompt.</p>
+        <button id="grant" data-i18n="permButton">Allow microphone</button>
         <p id="status"></p>
     </main>
 
+    <script src="i18n.js"></script>
     <script src="permission.js"></script>
 </body>
 

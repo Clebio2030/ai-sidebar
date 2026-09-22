@@ -4,5 +4,134 @@
   },
   "extDesc": {
     "message": "Abra ChatGPT, Claude, Gemini, Grok, Copilot, Meta AI, DeepSeek e Le Chat na barra lateral"
+  },
+
+  "providerLabel": {
+    "message": "Provedor de IA"
+  },
+  "floatButton": {
+    "message": "Flutuar"
+  },
+  "floatButtonTitle": {
+    "message": "Abrir como janela flutuante sobre a página"
+  },
+  "micButton": {
+    "message": "Liberar mic"
+  },
+  "micButtonTitle": {
+    "message": "Liberar o microfone para o painel"
+  },
+  "summarizeButton": {
+    "message": "Resumir página"
+  },
+  "summarizeButtonTitle": {
+    "message": "Resumir a página da aba ativa"
+  },
+  "summarizeLoading": {
+    "message": "Lendo…"
+  },
+
+  "blockedTitle": {
+    "message": "Não foi possível ler a página"
+  },
+  "blockedBadge": {
+    "message": "Página protegida ou do sistema"
+  },
+  "blockedIntro": {
+    "message": "Restrições de acesso a páginas:"
+  },
+  "blockedItem1": {
+    "message": "Páginas internas do navegador (chrome://)"
+  },
+  "blockedItem2": {
+    "message": "Chrome Web Store e páginas de configurações"
+  },
+  "blockedItem3": {
+    "message": "Abas protegidas por políticas de segurança"
+  },
+  "blockedOk": {
+    "message": "OK"
+  },
+  "blockedProtected": {
+    "message": "Abra um site comum numa aba, deixe-a como aba ativa e clique em Resumir de novo."
+  },
+  "blockedEmpty": {
+    "message": "A página não devolveu texto legível. Espere ela carregar e tente de novo."
+  },
+  "blockedTimeout": {
+    "message": "A página demorou demais para responder. Tente de novo."
+  },
+  "blockedUnknown": {
+    "message": "Não foi possível extrair o conteúdo da página."
+  },
+
+  "floatUnavailable": {
+    "message": "Janela flutuante indisponível"
+  },
+  "floatRestricted": {
+    "message": "A janela flutuante não pode abrir nesta aba. Vá para um site comum e tente de novo."
+  },
+  "floatFailed": {
+    "message": "Não foi possível abrir a janela flutuante: $reason$",
+    "placeholders": {
+      "reason": {
+        "content": "$1",
+        "example": "Cannot access contents of the page"
+      }
+    }
+  },
+  "reasonUnknown": {
+    "message": "motivo desconhecido"
+  },
+
+  "summaryPrompt": {
+    "message": "Resuma o conteúdo desta página em português.\n\nTítulo: $title$\nURL: $url$\n\nConteúdo:\n$content$",
+    "placeholders": {
+      "title": { "content": "$1", "example": "Rio Amazonas - Wikipédia" },
+      "url": { "content": "$2", "example": "https://pt.wikipedia.org/wiki/Rio_Amazonas" },
+      "content": { "content": "$3", "example": "O rio Amazonas é…" }
+    }
+  },
+
+  "floatProviderTitle": {
+    "message": "Trocar de provedor"
+  },
+  "floatPinTitle": {
+    "message": "Fixar: reabre sozinha em cada aba"
+  },
+  "floatDockTitle": {
+    "message": "Voltar ao painel lateral"
+  },
+  "floatCloseTitle": {
+    "message": "Fechar"
+  },
+  "floatFrameTitle": {
+    "message": "Provedor de IA"
+  },
+
+  "sendToSidebar": {
+    "message": "Enviar para a AI Sidebar"
+  },
+
+  "permPageTitle": {
+    "message": "Liberar microfone — AI Sidebar"
+  },
+  "permHeading": {
+    "message": "Liberar microfone"
+  },
+  "permBody": {
+    "message": "O painel lateral não consegue exibir o aviso de permissão do navegador, então o pedido é descartado antes que você possa respondê-lo. Esta aba mostra o aviso num lugar onde ele aparece. A permissão fica registrada para a extensão e passa a valer dentro do painel."
+  },
+  "permButton": {
+    "message": "Permitir microfone"
+  },
+  "permAlready": {
+    "message": "Microfone já liberado. Pode fechar esta aba e reabrir o painel."
+  },
+  "permWaiting": {
+    "message": "Aguardando sua resposta no aviso do navegador…"
+  },
+  "permDone": {
+    "message": "Pronto. Feche esta aba e reabra o painel lateral."
   }
 }

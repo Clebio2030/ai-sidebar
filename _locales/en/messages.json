@@ -4,5 +4,134 @@
   },
   "extDesc": {
     "message": "Open ChatGPT, Claude, Gemini, Grok, Copilot & More in Sidebar"
+  },
+
+  "providerLabel": {
+    "message": "AI provider"
+  },
+  "floatButton": {
+    "message": "Float"
+  },
+  "floatButtonTitle": {
+    "message": "Open as a floating window over the page"
+  },
+  "micButton": {
+    "message": "Allow mic"
+  },
+  "micButtonTitle": {
+    "message": "Allow microphone access for the panel"
+  },
+  "summarizeButton": {
+    "message": "Summarize page"
+  },
+  "summarizeButtonTitle": {
+    "message": "Summarize the page in the active tab"
+  },
+  "summarizeLoading": {
+    "message": "Reading…"
+  },
+
+  "blockedTitle": {
+    "message": "Could not read the page"
+  },
+  "blockedBadge": {
+    "message": "Protected or system page"
+  },
+  "blockedIntro": {
+    "message": "Page access restrictions:"
+  },
+  "blockedItem1": {
+    "message": "Browser internal pages (chrome://)"
+  },
+  "blockedItem2": {
+    "message": "Chrome Web Store and settings pages"
+  },
+  "blockedItem3": {
+    "message": "Tabs protected by security policies"
+  },
+  "blockedOk": {
+    "message": "OK"
+  },
+  "blockedProtected": {
+    "message": "Open a regular site in a tab, make it the active tab and click Summarize again."
+  },
+  "blockedEmpty": {
+    "message": "The page returned no readable text. Wait for it to finish loading and try again."
+  },
+  "blockedTimeout": {
+    "message": "The page took too long to respond. Try again."
+  },
+  "blockedUnknown": {
+    "message": "Could not extract the page content."
+  },
+
+  "floatUnavailable": {
+    "message": "Floating window unavailable"
+  },
+  "floatRestricted": {
+    "message": "The floating window cannot open on this tab. Go to a regular site and try again."
+  },
+  "floatFailed": {
+    "message": "Could not open the floating window: $reason$",
+    "placeholders": {
+      "reason": {
+        "content": "$1",
+        "example": "Cannot access contents of the page"
+      }
+    }
+  },
+  "reasonUnknown": {
+    "message": "unknown reason"
+  },
+
+  "summaryPrompt": {
+    "message": "Please summarize the content of this web page.\n\nTitle: $title$\nURL: $url$\n\nContent:\n$content$",
+    "placeholders": {
+      "title": { "content": "$1", "example": "Amazon River - Wikipedia" },
+      "url": { "content": "$2", "example": "https://en.wikipedia.org/wiki/Amazon_River" },
+      "content": { "content": "$3", "example": "The Amazon River is…" }
+    }
+  },
+
+  "floatProviderTitle": {
+    "message": "Switch provider"
+  },
+  "floatPinTitle": {
+    "message": "Pin: reopens by itself on every tab"
+  },
+  "floatDockTitle": {
+    "message": "Back to the side panel"
+  },
+  "floatCloseTitle": {
+    "message": "Close"
+  },
+  "floatFrameTitle": {
+    "message": "AI provider"
+  },
+
+  "sendToSidebar": {
+    "message": "Send to AI Sidebar"
+  },
+
+  "permPageTitle": {
+    "message": "Allow microphone — AI Sidebar"
+  },
+  "permHeading": {
+    "message": "Allow microphone"
+  },
+  "permBody": {
+    "message": "The side panel cannot show the browser's permission prompt, so the request is dismissed before you can answer it. This tab shows the prompt somewhere it can appear. The permission is recorded for the extension and then applies inside the panel."
+  },
+  "permButton": {
+    "message": "Allow microphone"
+  },
+  "permAlready": {
+    "message": "Microphone already allowed. You can close this tab and reopen the panel."
+  },
+  "permWaiting": {
+    "message": "Waiting for your answer in the browser prompt…"
+  },
+  "permDone": {
+    "message": "Done. Close this tab and reopen the side panel."
   }
 }

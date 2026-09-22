@@ -1,3 +1,4 @@
+traduzir()
 
 const providerSelect = document.getElementById('provider')
 const frame = document.getElementById('ai-frame')
@@ -66,19 +67,8 @@ const blocked = document.getElementById('blocked')
 const blockedDetail = document.getElementById('blocked-detail')
 const blockedAction = document.getElementById('blocked-action')
 
-const PROMPT_TEMPLATES = {
-    pt: 'Resuma o conteúdo desta página em português.\n\nTítulo: {TITLE}\nURL: {URL}\n\nConteúdo:\n{CONTENT}',
-    en: 'Please summarize the content of this webpage in English.\n\nTitle: {TITLE}\nURL: {URL}\n\nContent:\n{CONTENT}',
-}
-
-const buildSummaryPrompt = ({ title, url, content }) => {
-    const ui = (chrome.i18n.getUILanguage() || '').toLowerCase()
-    const template = PROMPT_TEMPLATES[ui.startsWith('pt') ? 'pt' : 'en']
-    return template
-        .replace('{TITLE}', title || '')
-        .replace('{URL}', url || '')
-        .replace('{CONTENT}', content || '')
-}
+const buildSummaryPrompt = ({ title, url, content }) =>
+    chrome.i18n.getMessage('summaryPrompt', [title || '', url || '', content || ''])
 
 const askBackground = (message, timeoutMs = 8000) =>
     new Promise((resolve) => {
@@ -97,7 +87,7 @@ const askBackground = (message, timeoutMs = 8000) =>
 const blockedTitle = document.getElementById('blocked-title')
 
 const showBlocked = (action, detail, titulo) => {
-    blockedTitle.textContent = titulo || 'Não foi possível ler a página'
+    blockedTitle.textContent = titulo || chrome.i18n.getMessage('blockedTitle')
     blockedAction.textContent = action
     blockedDetail.textContent = detail || ''
     blocked.showModal()
@@ -108,18 +98,18 @@ document.getElementById('blocked-ok').addEventListener('click', () => blocked.cl
 summarize.addEventListener('click', async () => {
     const label = summarize.querySelector('.btn-text')
     summarize.disabled = true
-    label.textContent = 'Lendo…'
+    label.textContent = chrome.i18n.getMessage('summarizeLoading')
     try {
         const page = await askBackground({ action: 'GET_ACTIVE_TAB_CONTENT' })
         if (!page?.content) {
             if (page?.error === 'protected') {
-                showBlocked('Abra um site comum numa aba, deixe-a como aba ativa e clique em Resumir de novo.', page.url)
+                showBlocked(chrome.i18n.getMessage('blockedProtected'), page.url)
             } else if (page?.error === 'empty') {
-                showBlocked('A página não devolveu texto legível. Espere ela carregar e tente de novo.', page.url)
+                showBlocked(chrome.i18n.getMessage('blockedEmpty'), page.url)
             } else if (page?.error === 'timeout') {
-                showBlocked('A página demorou demais para responder. Tente de novo.', page.url)
+                showBlocked(chrome.i18n.getMessage('blockedTimeout'), page.url)
             } else {
-                showBlocked('Não foi possível extrair o conteúdo.', page?.error)
+                showBlocked(chrome.i18n.getMessage('blockedUnknown'), page?.error)
             }
             return
         }
@@ -129,14 +119,10 @@ summarize.addEventListener('click', async () => {
         )
     } finally {
         summarize.disabled = false
-        label.textContent = 'Resumir página'
+        label.textContent = chrome.i18n.getMessage('summarizeButton')
     }
 })
 
-// The panel cannot show a permission bubble, so the mic request is dismissed
-// before the user can answer. A normal tab can show it, and the grant is stored
-// for this extension origin - which is what a delegated iframe request resolves
-// to - so it then applies inside the panel.
 // Troca para a janela flutuante: o service worker injeta na aba ativa e
 // passa a tratar o clique no ícone como "flutuar" em vez de "abrir painel".
 document.getElementById('flutuar').addEventListener('click', async () => {
@@ -149,13 +135,17 @@ document.getElementById('flutuar').addEventListener('click', async () => {
     }
     showBlocked(
         r?.motivo === 'restrita'
-            ? 'A janela flutuante não pode abrir nesta aba. Vá para um site comum e tente de novo.'
-            : 'Não foi possível abrir a janela flutuante: ' + (r?.motivo || 'motivo desconhecido'),
+            ? chrome.i18n.getMessage('floatRestricted')
+            : chrome.i18n.getMessage('floatFailed', [r?.motivo || chrome.i18n.getMessage('reasonUnknown')]),
         r?.url,
-        'Janela flutuante indisponível',
+        chrome.i18n.getMessage('floatUnavailable'),
     )
 })
 
+// O painel não consegue exibir o aviso de permissão, então o pedido de
+// microfone é descartado antes de o usuário responder. Uma aba normal consegue,
+// e a concessão fica registrada para a origem da extensão — que é para onde o
+// pedido delegado do iframe resolve — passando a valer dentro do painel.
 const micFix = document.getElementById("mic-fix")
 
 micFix.addEventListener("click", () => {
@@ -174,20 +164,3 @@ const trackMicPermission = async () => {
 }
 
 trackMicPermission()
-
-// --- Diagnóstico temporário: remover junto com o bloco em content.js ---
-window.addEventListener('message', (e) => {
-    if (e.data?.type !== 'ai-sidebar-diag') return
-    const r = e.data.report
-    const lines = [
-        'contexto    : ' + r.contexto,
-        'origem      : ' + r.origem,
-        'ancestrais  : ' + r.ancestrais,
-        'policy mic  : ' + r.policyMic,
-        'policy clip : ' + r.policyClipboard,
-        'perm mic    : ' + r.permMic,
-        'perm clip   : ' + r.permClipboard,
-        'getUserMedia: ' + r.getUserMedia,
-    ]
-    console.log(lines.map((l) => '[AI-Sidebar] ' + l).join('\n'))
-})

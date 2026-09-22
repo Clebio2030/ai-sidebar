@@ -86,14 +86,14 @@
         '<style>' + ESTILO + '</style>' +
         '<div class="janela">' +
         '  <div class="barra">' + PEGA +
-        '    <select id="prov" title="Trocar de provedor"></select>' +
-        '    <button class="acao" id="fixar" title="Fixar: reabre sozinha em cada página">' +
+        '    <select id="prov" title="' + chrome.i18n.getMessage('floatProviderTitle') + '"></select>' +
+        '    <button class="acao" id="fixar" title="' + chrome.i18n.getMessage('floatPinTitle') + '">' +
         SVG(ICONE_FIXAR, 2) + '</button>' +
-        '    <button class="acao" id="acoplar" title="Voltar ao painel lateral">' +
+        '    <button class="acao" id="acoplar" title="' + chrome.i18n.getMessage('floatDockTitle') + '">' +
         SVG(ICONE_ACOPLAR, 2) + '</button>' +
-        '    <button class="acao" id="fechar" title="Fechar">' + SVG(ICONE_FECHAR, 2.2) + '</button>' +
+        '    <button class="acao" id="fechar" title="' + chrome.i18n.getMessage('floatCloseTitle') + '">' + SVG(ICONE_FECHAR, 2.2) + '</button>' +
         '  </div>' +
-        '  <iframe id="quadro" title="Provedor de IA" allow="microphone; camera; clipboard-read;' +
+        '  <iframe id="quadro" title="' + chrome.i18n.getMessage('floatFrameTitle') + '" allow="microphone; camera; clipboard-read;' +
         ' clipboard-write; display-capture; autoplay; encrypted-media; fullscreen; picture-in-picture"></iframe>' +
         '  <div class="redimensionar" id="puxador"></div>' +
         '</div>'

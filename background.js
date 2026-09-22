@@ -208,7 +208,7 @@ chrome.runtime.onInstalled.addListener(() => {
   init()
   chrome.contextMenus.create({
     id: 'send-to-ai',
-    title: 'Send to AI Sidebar',
+    title: chrome.i18n.getMessage('sendToSidebar'),
     contexts: ['selection'],
   })
 })

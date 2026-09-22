@@ -1,18 +1,25 @@
-<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"><defs>
-  <radialGradient id="bgx" cx="0.5" cy="0.42" r="0.82">
-    <stop offset="0%" stop-color="#28325f"/><stop offset="100%" stop-color="#090c1c"/></radialGradient>
-  <linearGradient id="cox" x1="0.2" y1="0" x2="0.8" y2="1">
-    <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#cfe0ff"/></linearGradient>
-  <filter id="glx" x="-60%" y="-60%" width="220%" height="220%">
-    <feGaussianBlur stdDeviation="3.4" result="b"/>
-    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<rect width="128" height="128" rx="28" fill="url(#bgx)"/>
-<circle cx="64" cy="30" r="20" fill="#10a37f"/>
-<circle cx="34" cy="86" r="20" fill="#4285f4"/>
-<circle cx="94" cy="86" r="20" fill="#d97757"/>
-<path d="M64 36 C71.84 56.16, 71.84 56.16, 92 64
-    C71.84 71.84, 71.84 71.84, 64 92
-    C56.16 71.84, 56.16 71.84, 36 64
-    C56.16 56.16, 56.16 56.16, 64 36 Z"
-    fill="url(#cox)" filter="url(#glx)"/>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgx" cx="0.5" cy="0.42" r="0.82">
+      <stop offset="0%" stop-color="#28325f"/>
+      <stop offset="100%" stop-color="#090c1c"/>
+    </radialGradient>
+    <linearGradient id="cox" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#cfe0ff"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="28" fill="url(#bgx)"/>
+
+  <circle cx="64" cy="30" r="20" fill="#10a37f"/>
+  <circle cx="34" cy="86" r="20" fill="#4285f4"/>
+  <circle cx="94" cy="86" r="20" fill="#d97757"/>
+
+  <!-- Faisca de raio 21 e sem brilho: em 28 com halo as pontas ultrapassavam
+       os circulos e viravam espetos brancos nos tamanhos pequenos. -->
+  <path d="M64 43 C69.88 58.12, 69.88 58.12, 85 64
+           C69.88 69.88, 69.88 69.88, 64 85
+           C58.12 69.88, 58.12 69.88, 43 64
+           C58.12 58.12, 58.12 58.12, 64 43 Z" fill="url(#cox)"/>
 </svg>

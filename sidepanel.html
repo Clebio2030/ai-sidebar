@@ -237,20 +237,22 @@
 
 <body>
     <div class="toolbar">
-        <select id="provider" aria-label="Select AI provider">
+        <select id="provider" data-i18n-aria="providerLabel" aria-label="AI provider">
         </select>
-        <button id="flutuar" title="Abrir como janela flutuante sobre a página">
+        <button id="flutuar" data-i18n-title="floatButtonTitle" title="Open as a floating window over the page">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <rect x="2" y="4" width="14" height="11" rx="2"/>
                 <rect x="9" y="10" width="13" height="10" rx="2" fill="var(--surface)"/>
             </svg>
-            Flutuar
+            <span data-i18n="floatButton">Float</span>
         </button>
-        <button id="mic-fix" hidden title="Liberar microfone para o painel">🎤 Liberar</button>
+        <button id="mic-fix" hidden data-i18n-title="micButtonTitle" title="Allow microphone access for the panel">
+            <span data-i18n="micButton">Allow mic</span>
+        </button>
     </div>
     <div id="summary-layer">
-        <button id="summarize" title="Resumir a página da aba ativa">
+        <button id="summarize" data-i18n-title="summarizeButtonTitle" title="Summarize the page in the active tab">
             <span class="btn-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="#1a73e8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -261,7 +263,7 @@
                     <path d="M7 9h12" />
                 </svg>
             </span>
-            <span class="btn-text">Resumir página</span>
+            <span class="btn-text" data-i18n="summarizeButton">Summarize page</span>
         </button>
     </div>
 
@@ -281,30 +283,31 @@
                 <path d="M7 9h12" />
             </svg>
         </div>
-        <h2 id="blocked-title">Não foi possível ler a página</h2>
+        <h2 id="blocked-title" data-i18n="blockedTitle">Could not read the page</h2>
         <div class="modal-badge">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                 stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
-            Página protegida ou do sistema
+            <span data-i18n="blockedBadge">Protected or system page</span>
         </div>
         <div class="modal-body">
-            <p>Restrições de acesso a páginas:</p>
+            <p data-i18n="blockedIntro">Page access restrictions:</p>
             <ul>
-                <li>Páginas internas do navegador (chrome://)</li>
-                <li>Chrome Web Store e páginas de configurações</li>
-                <li>Abas protegidas por políticas de segurança</li>
+                <li data-i18n="blockedItem1">Browser internal pages (chrome://)</li>
+                <li data-i18n="blockedItem2">Chrome Web Store and settings pages</li>
+                <li data-i18n="blockedItem3">Tabs protected by security policies</li>
             </ul>
             <p id="blocked-action" style="margin:10px 0 0"></p>
             <p id="blocked-detail" style="margin:6px 0 0; font-weight:400; opacity:.8"></p>
         </div>
         <div class="modal-footer">
-            <button id="blocked-ok">OK</button>
+            <button id="blocked-ok" data-i18n="blockedOk">OK</button>
         </div>
     </dialog>
 
+    <script src="i18n.js"></script>
     <script src="providers.js"></script>
     <script src="sidepanel.js"></script>
 </body>
