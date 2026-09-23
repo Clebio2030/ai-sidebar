@@ -7,3 +7,6 @@ Gemini-Sidebar-Chrome-Web-Store/
 
 # Comparativo de icones (temporario, ate a escolha)
 variacoes-icone.*
+
+# Pacotes gerados para a loja
+dist/
