@@ -40,6 +40,11 @@
     const ICONE_FIXAR =
         '<path d="M12 17v5"/>' +
         '<path d="M9 10.76V7a3 3 0 0 1 6 0v3.76a2 2 0 0 0 .59 1.42L18 14.5V17H6v-2.5l2.41-2.32A2 2 0 0 0 9 10.76Z"/>'
+    const ICONE_RECARREGAR =
+        '<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>' +
+        '<path d="M21 3v5h-5"/>' +
+        '<path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>' +
+        '<path d="M8 16H3v5"/>'
     const ICONE_ACOPLAR = '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>'
     const ICONE_FECHAR = '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'
     const SVG = (conteudo, largura) =>
@@ -87,6 +92,7 @@
         '<div class="janela">' +
         '  <div class="barra">' + PEGA +
         '    <select id="prov" title="' + chrome.i18n.getMessage('floatProviderTitle') + '"></select>' +
+        '    <button class="acao" id="recarregar" title="Recarregar">' + SVG(ICONE_RECARREGAR, 2) + '</button>' +
         '    <button class="acao" id="fixar" title="' + chrome.i18n.getMessage('floatPinTitle') + '">' +
         SVG(ICONE_FIXAR, 2) + '</button>' +
         '    <button class="acao" id="acoplar" title="' + chrome.i18n.getMessage('floatDockTitle') + '">' +
@@ -228,6 +234,15 @@
         estado.fixado = !estado.fixado
         pintar()
         salvar()
+    })
+
+    raiz.querySelector('#recarregar').addEventListener('click', () => {
+        delete conversas[estado.provedor]
+        chrome.storage.local.set({ conversas }).catch(() => {})
+        quadro.src = 'about:blank'
+        setTimeout(() => {
+            quadro.src = providerUrl(estado.provedor)
+        }, 50)
     })
 
     raiz.querySelector('#acoplar').addEventListener('click', () => {

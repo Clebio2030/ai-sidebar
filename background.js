@@ -13,6 +13,10 @@ const applySessionRules = async () => {
               { header: 'Content-Security-Policy', operation: 'remove' },
               { header: 'Content-Security-Policy-Report-Only', operation: 'remove' },
               { header: 'X-Frame-Options', operation: 'remove' },
+              { header: 'Frame-Options', operation: 'remove' },
+              { header: 'Cross-Origin-Resource-Policy', operation: 'remove' },
+              { header: 'Cross-Origin-Embedder-Policy', operation: 'remove' },
+              { header: 'Cross-Origin-Opener-Policy', operation: 'remove' },
               // Sites (Gemini/Copilot) ship a Permissions-Policy that disables the
               // microphone and the Clipboard API inside embedded frames.
               { header: 'Permissions-Policy', operation: 'remove' },
@@ -21,6 +25,20 @@ const applySessionRules = async () => {
           },
           condition: {
             resourceTypes: ['sub_frame'],
+          },
+        },
+        {
+          id: 2,
+          action: {
+            type: 'modifyHeaders',
+            requestHeaders: [
+              { header: 'sec-fetch-dest', operation: 'set', value: 'document' },
+              { header: 'sec-fetch-site', operation: 'set', value: 'same-origin' },
+            ],
+          },
+          condition: {
+            resourceTypes: ['sub_frame'],
+            excludedRequestDomains: ['chatgpt.com'],
           },
         },
       ],
