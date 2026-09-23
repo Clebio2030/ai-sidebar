@@ -1,6 +1,6 @@
 const applySessionRules = () =>
   chrome.declarativeNetRequest.updateSessionRules({
-    removeRuleIds: [1],
+    removeRuleIds: [1, 2],
     addRules: [
       {
         id: 1,
@@ -15,6 +15,19 @@ const applySessionRules = () =>
             { header: 'Permissions-Policy', operation: 'remove' },
             { header: 'Feature-Policy', operation: 'remove' },
           ],
+        },
+        condition: {
+          resourceTypes: ['sub_frame'],
+        },
+      },
+      {
+        // Faking sec-fetch-site as same-origin gets some providers past
+        // fetch-metadata checks. ChatGPT checks it against the browser's real
+        // metadata, and treats the mismatch as a hijacked session - it logs the
+        // frame out ("Sua sessão foi encerrada"). Excluded here for that reason.
+        id: 2,
+        action: {
+          type: 'modifyHeaders',
           requestHeaders: [
             { header: 'sec-fetch-dest', operation: 'set', value: 'document' },
             { header: 'sec-fetch-site', operation: 'set', value: 'same-origin' },
@@ -22,6 +35,7 @@ const applySessionRules = () =>
         },
         condition: {
           resourceTypes: ['sub_frame'],
+          excludedRequestDomains: ['chatgpt.com'],
         },
       },
     ],
@@ -199,6 +213,77 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     })()
     return true // resposta assincrona
   }
+
+  // --- Janela popup para provedores que não funcionam em iframe -------------
+
+  if (request?.action === 'OPEN_PROVIDER_POPUP') {
+    ;(async () => {
+      try {
+        const url = request.url || 'https://chatgpt.com/'
+        // Verifica se já existe uma popup nossa aberta
+        const { providerPopupId } = await chrome.storage.local.get('providerPopupId')
+        if (providerPopupId) {
+          try {
+            const win = await chrome.windows.get(providerPopupId, { populate: true })
+            if (win) {
+              // Reutiliza: navega para a nova URL e traz para frente
+              const [tab] = win.tabs || []
+              if (tab?.id) await chrome.tabs.update(tab.id, { url })
+              await chrome.windows.update(providerPopupId, { focused: true })
+              sendResponse({ ok: true, reused: true })
+              return
+            }
+          } catch (_) { /* janela fechada, cria nova */ }
+        }
+
+        // Posiciona a popup ao lado da janela do painel
+        let left = 800, top = 100, width = 480, height = 900
+        const senderWinId = sender.tab?.windowId
+        if (senderWinId) {
+          try {
+            const win = await chrome.windows.get(senderWinId)
+            left = (win.left || 0) + (win.width || 1200) // logo à direita
+            top = win.top || 0
+            height = win.height || 900
+          } catch (_) {}
+        }
+
+        const popup = await chrome.windows.create({
+          url,
+          type: 'popup',
+          width,
+          height,
+          left,
+          top,
+        })
+        await chrome.storage.local.set({ providerPopupId: popup.id })
+        sendResponse({ ok: true })
+      } catch (error) {
+        sendResponse({ ok: false, error: error?.message })
+      }
+    })()
+    return true
+  }
+
+  if (request?.action === 'POPUP_PROVIDER_CHANGED') {
+    // Provedor trocou enquanto a popup está aberta: navega para a nova URL
+    ;(async () => {
+      const { providerPopupId } = await chrome.storage.local.get('providerPopupId')
+      if (!providerPopupId) return
+      try {
+        const win = await chrome.windows.get(providerPopupId, { populate: true })
+        const [tab] = win.tabs || []
+        if (tab?.id) await chrome.tabs.update(tab.id, { url: request.url })
+      } catch (_) {
+        // Janela não existe mais — limpa o ID
+        chrome.storage.local.remove('providerPopupId')
+      }
+    })()
+    return
+  }
+
+  // -------------------------------------------------------------------------
+
   if (request?.action !== "GET_ACTIVE_TAB_CONTENT") return
   getActiveTabContent().then(sendResponse)
   return true // keep the channel open for the async reply
@@ -219,6 +304,15 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === 'send-to-ai' && info.selectionText) {
     chrome.storage.local.set({ pendingText: info.selectionText })
     chrome.sidePanel.open({ windowId: tab.windowId })
+  }
+})
+
+// Limpa o ID da popup quando o usuário fecha a janela, para que o botão
+// "Abrir" funcione novamente em vez de tentar reutilizar uma janela morta.
+chrome.windows.onRemoved.addListener(async (windowId) => {
+  const { providerPopupId } = await chrome.storage.local.get('providerPopupId')
+  if (providerPopupId === windowId) {
+    chrome.storage.local.remove('providerPopupId')
   }
 })
 

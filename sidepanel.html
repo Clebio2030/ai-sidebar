@@ -232,6 +232,99 @@
             height: 100%;
             background: white;
         }
+
+        /* Tela de placeholder para provedores que não funcionam em iframe */
+        #popup-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 32px 24px;
+            text-align: center;
+            gap: 20px;
+            box-sizing: border-box;
+        }
+
+        #popup-screen .popup-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,.08);
+        }
+
+        #popup-screen .popup-icon svg {
+            width: 36px;
+            height: 36px;
+            opacity: 0.7;
+        }
+
+        #popup-screen h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: -.02em;
+            margin: 0;
+            color: var(--text);
+        }
+
+        #popup-screen p {
+            font-size: .82rem;
+            line-height: 1.6;
+            color: var(--muted);
+            margin: 0;
+            max-width: 280px;
+        }
+
+        #popup-screen .info-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fff3cd;
+            color: #856404;
+            border-radius: 100px;
+            padding: 5px 14px;
+            font-size: .75rem;
+            font-weight: 500;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            #popup-screen .info-badge {
+                background: #3d2f00;
+                color: #ffc947;
+            }
+        }
+
+        #popup-open-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 24px;
+            background: linear-gradient(135deg, #1a73e8, #0d47a1);
+            color: white;
+            border: none;
+            border-radius: 100px;
+            font-family: inherit;
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(26,115,232,.35);
+            transition: transform .15s, box-shadow .15s;
+        }
+
+        #popup-open-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(26,115,232,.45);
+        }
+
+        #popup-open-btn svg {
+            width: 16px;
+            height: 16px;
+        }
     </style>
 </head>
 
@@ -269,6 +362,35 @@
 
     <iframe id="ai-frame" src="about:blank" title="AI provider"
         allow="microphone; camera; clipboard-read; clipboard-write; display-capture; autoplay; encrypted-media; fullscreen; picture-in-picture"></iframe>
+
+    <!-- Tela para provedores que não funcionam em iframe (ChatGPT, DeepSeek) -->
+    <div id="popup-screen" hidden>
+        <div class="popup-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="14" height="11" rx="2"/>
+                <rect x="9" y="10" width="13" height="10" rx="2"/>
+            </svg>
+        </div>
+        <h3><span id="popup-provider-name">ChatGPT</span> abre em janela separada</h3>
+        <div class="info-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            Cookies bloqueados em iframe
+        </div>
+        <p>Este provedor usa proteção de sessão que impede o carregamento dentro do painel. Ele abre em uma janela separada ao lado.</p>
+        <button id="popup-open-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+            Abrir <span id="popup-provider-name-btn"></span>
+        </button>
+    </div>
 
     <dialog id="blocked">
         <div class="modal-icons">
