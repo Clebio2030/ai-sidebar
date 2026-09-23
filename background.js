@@ -1,31 +1,34 @@
-const applySessionRules = () =>
-  chrome.declarativeNetRequest.updateSessionRules({
-    removeRuleIds: [1],
-    addRules: [
-      {
-        id: 1,
-        action: {
-          type: 'modifyHeaders',
-          responseHeaders: [
-            { header: 'Content-Security-Policy', operation: 'remove' },
-            { header: 'Content-Security-Policy-Report-Only', operation: 'remove' },
-            { header: 'X-Frame-Options', operation: 'remove' },
-            // Sites (Gemini/Copilot) ship a Permissions-Policy that disables the
-            // microphone and the Clipboard API inside embedded frames.
-            { header: 'Permissions-Policy', operation: 'remove' },
-            { header: 'Feature-Policy', operation: 'remove' },
-          ],
-          requestHeaders: [
-            { header: 'sec-fetch-dest', operation: 'set', value: 'document' },
-            { header: 'sec-fetch-site', operation: 'set', value: 'same-origin' },
-          ],
+const applySessionRules = async () => {
+  try {
+    const existing = await chrome.declarativeNetRequest.getSessionRules()
+    const removeRuleIds = existing.map((r) => r.id)
+    await chrome.declarativeNetRequest.updateSessionRules({
+      removeRuleIds,
+      addRules: [
+        {
+          id: 1,
+          action: {
+            type: 'modifyHeaders',
+            responseHeaders: [
+              { header: 'Content-Security-Policy', operation: 'remove' },
+              { header: 'Content-Security-Policy-Report-Only', operation: 'remove' },
+              { header: 'X-Frame-Options', operation: 'remove' },
+              // Sites (Gemini/Copilot) ship a Permissions-Policy that disables the
+              // microphone and the Clipboard API inside embedded frames.
+              { header: 'Permissions-Policy', operation: 'remove' },
+              { header: 'Feature-Policy', operation: 'remove' },
+            ],
+          },
+          condition: {
+            resourceTypes: ['sub_frame'],
+          },
         },
-        condition: {
-          resourceTypes: ['sub_frame'],
-        },
-      },
-    ],
-  })
+      ],
+    })
+  } catch (error) {
+    console.error('Erro ao aplicar regras de rede:', error)
+  }
+}
 
 const init = async () => {
   await applySessionRules()
