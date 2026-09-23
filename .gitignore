@@ -10,3 +10,6 @@ variacoes-icone.*
 
 # Pacotes gerados para a loja
 dist/
+
+# Capturas de tela com sessao real, ate a revisao
+capturas/
