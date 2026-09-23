@@ -2,9 +2,6 @@ traduzir()
 
 const providerSelect = document.getElementById('provider')
 const frame = document.getElementById('ai-frame')
-const popupScreen = document.getElementById('popup-screen')
-const popupProviderName = document.getElementById('popup-provider-name')
-const popupOpenBtn = document.getElementById('popup-open-btn')
 
 // As opções vêm de providers.js, para não haver duas listas divergindo.
 for (const p of AI_PROVIDERS) {
@@ -16,33 +13,16 @@ for (const p of AI_PROVIDERS) {
 
 // Última conversa aberta em cada provedor, compartilhada com a janela
 // flutuante: é o que faz alternar entre painel e janela — ou trocar de aba —
-// continuar de onde parou, em vez de recomecar do zero.
+// continuar de onde parou, em vez de recomeçar do zero.
 let conversas = {}
 let provedorAtual = 'chatgpt'
 
 const setProvider = async (id) => {
     const safe = providerExists(id) ? id : AI_PROVIDERS[0].id
     provedorAtual = safe
-    await chrome.storage.local.set({ selectedProvider: safe })
+    frame.src = conversas[safe] || providerUrl(safe)
     providerSelect.value = safe
-
-    if (providerIsPopupOnly(safe)) {
-        // Provedor não funciona em iframe (cookies de terceiros bloqueados).
-        // Mostra tela intermediária e gerencia janela popup.
-        frame.src = 'about:blank'
-        frame.hidden = true
-        const nomeProv = AI_PROVIDERS.find(p => p.id === safe)?.nome || safe
-        popupProviderName.textContent = nomeProv
-        const btnSpan = document.getElementById('popup-provider-name-btn')
-        if (btnSpan) btnSpan.textContent = nomeProv
-        popupScreen.hidden = false
-        // Avisa o service worker para sincronizar a janela popup aberta (se houver)
-        chrome.runtime.sendMessage({ action: 'POPUP_PROVIDER_CHANGED', id: safe, url: providerUrl(safe) })
-    } else {
-        popupScreen.hidden = true
-        frame.hidden = false
-        frame.src = conversas[safe] || providerUrl(safe)
-    }
+    await chrome.storage.local.set({ selectedProvider: safe })
 }
 
 providerSelect.addEventListener('change', e => setProvider(e.target.value))
@@ -64,11 +44,6 @@ chrome.storage.local.get(['selectedProvider', 'conversas']).then(
         setProvider(selectedProvider)
     },
 )
-
-// Botão de abrir janela popup do provedor
-popupOpenBtn?.addEventListener('click', () => {
-    chrome.runtime.sendMessage({ action: 'OPEN_PROVIDER_POPUP', id: provedorAtual, url: providerUrl(provedorAtual) })
-})
 
 // When the iframe finishes loading, deliver any pending text
 frame.addEventListener('load', async () => {

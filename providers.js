@@ -6,15 +6,13 @@
 // segunda vez. `var` dentro do guarda é içado para o escopo do mundo isolado.
 if (typeof AI_PROVIDERS === 'undefined') {
     var AI_PROVIDERS = [
-        // popupOnly: cookies de terceiros são bloqueados em iframes cross-origin.
-        // Esses provedores abrem em janela popup (com cookies first-party) em vez de iframe.
-        { id: 'chatgpt',  nome: 'ChatGPT',           url: 'https://chatgpt.com/',           popupOnly: true },
+        { id: 'chatgpt',  nome: 'ChatGPT',           url: 'https://chatgpt.com/' },
         { id: 'claude',   nome: 'Claude',            url: 'https://claude.ai/new' },
         { id: 'gemini',   nome: 'Gemini',            url: 'https://gemini.google.com/app' },
         { id: 'grok',     nome: 'Grok (X)',          url: 'https://grok.com/' },
         { id: 'copilot',  nome: 'Copilot',           url: 'https://copilot.microsoft.com/' },
         { id: 'meta',     nome: 'Meta AI',           url: 'https://www.meta.ai/' },
-        { id: 'deepseek', nome: 'DeepSeek',          url: 'https://chat.deepseek.com/',     popupOnly: true },
+        { id: 'deepseek', nome: 'DeepSeek',          url: 'https://chat.deepseek.com/' },
         { id: 'lechat',   nome: 'Le Chat (Mistral)', url: 'https://chat.mistral.ai/chat' },
     ]
 
@@ -22,8 +20,6 @@ if (typeof AI_PROVIDERS === 'undefined') {
         (AI_PROVIDERS.find((p) => p.id === id) || AI_PROVIDERS[0]).url
 
     var providerExists = (id) => AI_PROVIDERS.some((p) => p.id === id)
-
-    var providerIsPopupOnly = (id) => !!(AI_PROVIDERS.find((p) => p.id === id)?.popupOnly)
 
     // Usado para conferir se uma URL relatada pertence mesmo ao provedor atual,
     // e não a um redirecionamento de login.

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_extName__",
   "description": "__MSG_extDesc__",
-  "version": "1.2.1",
+  "version": "1.2.0",
   "author": "AI Sidebar",
   "default_locale": "en",
   "action": {
@@ -23,8 +23,7 @@
     "declarativeNetRequest",
     "storage",
     "contextMenus",
-    "scripting",
-    "windows"
+    "scripting"
   ],
   "host_permissions": [
     "<all_urls>"
